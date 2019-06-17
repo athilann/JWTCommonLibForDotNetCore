@@ -14,8 +14,6 @@ namespace JWTCommonLibForDotNetCore.Services
     public interface IIdentityService
     {
         Identity Authenticate(string username, string password);
-        IEnumerable<Identity> GetAll();
-        IEnumerable<Identity> GetUsers();
         void RevokeToken(string token);
     }
 
@@ -24,10 +22,10 @@ namespace JWTCommonLibForDotNetCore.Services
         // users hardcoded for simplicity, store in a db with hashed passwords in production applications
         private List<Identity> _identities = new List<Identity>
         {
-            new Identity { Id = 1, Username = "test",  Password = "test", Role= "Admin" },
-            new Identity { Id = 2, Username = "test2", Password = "test" },
-            new Identity { Id = 3, Username = "test3", Password = "test" },
-            new Identity { Id = 4, Username = "test4", Password = "test", Role= "Admin" },
+            new Identity { Id = 1, Username = "test",  Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}} },
+            new Identity { Id = 2, Username = "test2", Password = "test", Roles = new List<Role>(){new Role(){Id= 3,Name = "User"}, new Role(){Id= 2,Name = "Bidder"}}},
+            new Identity { Id = 3, Username = "test3", Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}, new Role(){Id= 2,Name = "Bidder"}} },
+            new Identity { Id = 4, Username = "test4", Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}} },
             new Identity { Id = 5, Username = "test5", Password = "test" },
             new Identity { Id = 6, Username = "test6", Password = "test" }
         };
@@ -55,11 +53,17 @@ namespace JWTCommonLibForDotNetCore.Services
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, identity.Id.ToString()),
-                    new Claim(ClaimTypes.Role, identity.Role)
+                    //new Claim(ClaimTypes.Role, identity.Role),
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
+
+            foreach (var role in identity.Roles)
+            {
+                tokenDescriptor.Subject.AddClaim(new Claim(ClaimTypes.Role, role.Name));
+            }
+
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             identity.Token = tokenHandler.WriteToken(token);
@@ -70,27 +74,11 @@ namespace JWTCommonLibForDotNetCore.Services
             return identity;
         }
 
-        public void RevokeToken(string token){
+        public void RevokeToken(string token)
+        {
             RedisAccess.Instance.AddToken(token);
         }
 
-        public IEnumerable<Identity> GetAll()
-        {
-            // return users without passwords
-            return _identities.Select(x =>
-            {
-                x.Password = null;
-                return x;
-            });
-        }
-        public IEnumerable<Identity> GetUsers()
-        {
-            // return users without passwords
-            return _identities.Where(s => s.Role == "User").ToList().Select(x =>
-            {
-                x.Password = null;
-                return x;
-            });
-        }
+
     }
 }

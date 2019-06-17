@@ -28,14 +28,6 @@ namespace JWTCommonLibForDotNetCore.Controllers
             return Ok(identity);
         }
 
-        [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public IActionResult GetAll()
-        {
-            var identity =  _identityService.GetAll();
-            return Ok(identity);
-        }
-
         [HttpPost("revoke")]
         [Authorize]
         public IActionResult Revoke()
