@@ -15,19 +15,20 @@ namespace JWTCommonLibForDotNetCore.Services
     {
         Identity Authenticate(string username, string password);
         IEnumerable<Identity> GetAll();
+        IEnumerable<Identity> GetUsers();
     }
 
     public class IdentityService : IIdentityService
     {
         // users hardcoded for simplicity, store in a db with hashed passwords in production applications
         private List<Identity> _identities = new List<Identity>
-        { 
-            new Identity { Id = 1, Username = "test",  Password = "test" },
-            new Identity { Id = 2, Username = "test2", Password = "test" }, 
+        {
+            new Identity { Id = 1, Username = "test",  Password = "test", Role= "Admin" },
+            new Identity { Id = 2, Username = "test2", Password = "test" },
             new Identity { Id = 3, Username = "test3", Password = "test" },
-            new Identity { Id = 4, Username = "test4", Password = "test" },
+            new Identity { Id = 4, Username = "test4", Password = "test", Role= "Admin" },
             new Identity { Id = 5, Username = "test5", Password = "test" },
-            new Identity { Id = 6, Username = "test6", Password = "test" }  
+            new Identity { Id = 6, Username = "test6", Password = "test" }
         };
 
         private readonly JWTSettings _jwtSettings;
@@ -50,14 +51,16 @@ namespace JWTCommonLibForDotNetCore.Services
             var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[] 
+                Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, identity.Id.ToString())
+                    new Claim(ClaimTypes.Name, identity.Id.ToString()),
+                    new Claim(ClaimTypes.Role, identity.Role)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
+
             identity.Token = tokenHandler.WriteToken(token);
 
             // remove password before returning
@@ -69,7 +72,17 @@ namespace JWTCommonLibForDotNetCore.Services
         public IEnumerable<Identity> GetAll()
         {
             // return users without passwords
-            return _identities.Select(x => {
+            return _identities.Select(x =>
+            {
+                x.Password = null;
+                return x;
+            });
+        }
+        public IEnumerable<Identity> GetUsers()
+        {
+            // return users without passwords
+            return _identities.Where(s => s.Role == "User").ToList().Select(x =>
+            {
                 x.Password = null;
                 return x;
             });

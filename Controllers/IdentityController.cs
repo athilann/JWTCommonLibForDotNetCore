@@ -5,7 +5,6 @@ using JWTCommonLibForDotNetCore.Entities;
 
 namespace JWTCommonLibForDotNetCore.Controllers
 {
-  [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class IdentityController : ControllerBase
@@ -30,10 +29,12 @@ namespace JWTCommonLibForDotNetCore.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetAll()
         {
             var identity =  _identityService.GetAll();
             return Ok(identity);
         }
+      
     }
 }
