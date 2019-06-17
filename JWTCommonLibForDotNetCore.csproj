@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <PackageId>JWTCommonLibForDotNetCoreSample</PackageId>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Authors>Athila Ninow</Authors>
     <Company>MyOwn</Company>
     <license>https://en.wikipedia.org/wiki/GNU_General_Public_License</license>
