@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <PackageId>JWTCommonLibForDotNetCoreSample</PackageId>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <Authors>Athila Ninow</Authors>
     <Company>MyOwn</Company>
     <license>https://en.wikipedia.org/wiki/GNU_General_Public_License</license>
@@ -12,5 +12,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
   </ItemGroup>
 </Project>

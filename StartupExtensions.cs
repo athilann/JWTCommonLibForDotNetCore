@@ -10,11 +10,14 @@ using Microsoft.IdentityModel.Tokens;
 using JWTCommonLibForDotNetCore.Controllers;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using System.Reflection;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace JWTCommonLibForDotNetCore
 {
     public static class StartupExtensions
     {
+        private static bool UseRedis = false;
         public static void AddJwt(this IServiceCollection services, IConfiguration Configuration)
         {
             services.AddScoped<IIdentityService, IdentityService>();
@@ -32,6 +35,10 @@ namespace JWTCommonLibForDotNetCore
             })
             .AddJwtBearer(x =>
             {
+                x.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = OnTokenValidated
+                };
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters
@@ -43,6 +50,21 @@ namespace JWTCommonLibForDotNetCore
                 };
             });
 
+            if (appSettings.RedisConnectionString != null && appSettings.RedisConnectionString != string.Empty)
+            {
+                RedisAccess.Startup(appSettings.RedisConnectionString);
+                UseRedis = true;
+            }
+
+        }
+
+        private static Task OnTokenValidated(TokenValidatedContext context)
+        {
+            if (UseRedis && RedisAccess.Instance.TokenExists(context.Request.Headers["Authorization"].ToString()))
+            {
+                context.Fail("invalid_token");
+            }
+            return Task.FromResult(0);
         }
 
     }

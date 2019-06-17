@@ -35,6 +35,15 @@ namespace JWTCommonLibForDotNetCore.Controllers
             var identity =  _identityService.GetAll();
             return Ok(identity);
         }
+
+        [HttpPost("revoke")]
+        [Authorize]
+        public IActionResult Revoke()
+        {
+            var accesToken = Request.Headers["Authorization"];
+            _identityService.RevokeToken(accesToken);
+             return Ok();
+        }
       
     }
 }

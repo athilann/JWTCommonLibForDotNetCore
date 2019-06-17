@@ -16,6 +16,7 @@ namespace JWTCommonLibForDotNetCore.Services
         Identity Authenticate(string username, string password);
         IEnumerable<Identity> GetAll();
         IEnumerable<Identity> GetUsers();
+        void RevokeToken(string token);
     }
 
     public class IdentityService : IIdentityService
@@ -67,6 +68,10 @@ namespace JWTCommonLibForDotNetCore.Services
             identity.Password = null;
 
             return identity;
+        }
+
+        public void RevokeToken(string token){
+            RedisAccess.Instance.AddToken(token);
         }
 
         public IEnumerable<Identity> GetAll()
