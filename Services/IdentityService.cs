@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using JWTCommonLibForDotNetCore.Entities;
 using JWTCommonLibForDotNetCore.Helpers;
+using JWTCommonLibForDotNetCore.Database;
 
 namespace JWTCommonLibForDotNetCore.Services
 {
@@ -22,12 +23,12 @@ namespace JWTCommonLibForDotNetCore.Services
         // users hardcoded for simplicity, store in a db with hashed passwords in production applications
         private List<Identity> _identities = new List<Identity>
         {
-            new Identity { Id = 1, Username = "test",  Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}} },
-            new Identity { Id = 2, Username = "test2", Password = "test", Roles = new List<Role>(){new Role(){Id= 3,Name = "User"}, new Role(){Id= 2,Name = "Bidder"}}},
-            new Identity { Id = 3, Username = "test3", Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}, new Role(){Id= 2,Name = "Bidder"}} },
-            new Identity { Id = 4, Username = "test4", Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}} },
-            new Identity { Id = 5, Username = "test5", Password = "test" },
-            new Identity { Id = 6, Username = "test6", Password = "test" }
+            new Identity { Id = Guid.NewGuid(), Username = "test",  Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}}},
+            new Identity { Id = Guid.NewGuid(), Username = "test2", Password = "test", Roles = new List<Role>(){new Role(){Id= 3,Name = "User"}, new Role(){Id= 2,Name = "Bidder"}}},
+            new Identity { Id = Guid.NewGuid(), Username = "test3", Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}, new Role(){Id= 2,Name = "Bidder"}}},
+            new Identity { Id = Guid.NewGuid(), Username = "test4", Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}}},
+            new Identity { Id = Guid.NewGuid(), Username = "test5", Password = "test" },
+            new Identity { Id = Guid.NewGuid(), Username = "test6", Password = "test" }
         };
 
         private readonly JWTSettings _jwtSettings;

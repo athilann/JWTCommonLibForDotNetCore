@@ -1,10 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace JWTCommonLibForDotNetCore.Entities
 {
     public class Identity
     {
-        public int Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public List<Role> Roles { get; set; }
@@ -16,6 +21,9 @@ namespace JWTCommonLibForDotNetCore.Entities
     }
 
     public class Role{
+
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id {get;set;}
         public string Name{get;set;}
     }

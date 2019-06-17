@@ -2,7 +2,7 @@ using StackExchange.Redis;
 
 
 
-namespace JWTCommonLibForDotNetCore.Services
+namespace JWTCommonLibForDotNetCore.Database
 {
     public class RedisAccess
     {
