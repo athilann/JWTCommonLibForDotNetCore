@@ -57,7 +57,7 @@ namespace JWTCommonLibForDotNetCore
 
             if (appSettings.RedisConnectionString != null && appSettings.RedisConnectionString != string.Empty)
             {
-                RedisAccess.Startup(appSettings.RedisConnectionString);
+                RedisAccess.Startup(appSettings.RedisConnectionString, appSettings.TokenExpiredTimeInSecounds);
                 UseRedis = true;
             }
 

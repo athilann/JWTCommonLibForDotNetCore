@@ -12,10 +12,12 @@ namespace JWTCommonLibForDotNetCore.Database
 
 
         private ConnectionMultiplexer _redis;
-        public static void Startup(string connectionString)
+        private int _tokenExpiredTimeInSecounds; 
+        public static void Startup(string connectionString, string tokenExpiredTimeInSecounds)
         {
             _instance = new RedisAccess();
             _instance._redis = ConnectionMultiplexer.Connect(connectionString);
+            _instance._tokenExpiredTimeInSecounds = int.Parse(tokenExpiredTimeInSecounds);
         }
 
 
@@ -24,7 +26,7 @@ namespace JWTCommonLibForDotNetCore.Database
         }
 
         public void AddToken(string token){
-            _redis.GetDatabase().SetAdd(token,token);
+            _redis.GetDatabase().StringSet(token,token,new System.TimeSpan(0,0,_tokenExpiredTimeInSecounds));
         }
 
     }

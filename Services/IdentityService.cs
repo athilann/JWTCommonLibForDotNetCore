@@ -20,16 +20,6 @@ namespace JWTCommonLibForDotNetCore.Services
 
     public class IdentityService : IIdentityService
     {
-        // users hardcoded for simplicity, store in a db with hashed passwords in production applications
-        private List<Identity> _identities = new List<Identity>
-        {
-            new Identity { Id = Guid.NewGuid(), Username = "test",  Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}}},
-            new Identity { Id = Guid.NewGuid(), Username = "test2", Password = "test", Roles = new List<Role>(){new Role(){Id= 3,Name = "User"}, new Role(){Id= 2,Name = "Bidder"}}},
-            new Identity { Id = Guid.NewGuid(), Username = "test3", Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}, new Role(){Id= 2,Name = "Bidder"}}},
-            new Identity { Id = Guid.NewGuid(), Username = "test4", Password = "test", Roles = new List<Role>(){new Role(){Id= 1,Name = "Admin"}}},
-            new Identity { Id = Guid.NewGuid(), Username = "test5", Password = "test" },
-            new Identity { Id = Guid.NewGuid(), Username = "test6", Password = "test" }
-        };
 
         private readonly IDataRepository<Identity> _dataRepository;
         private readonly JWTSettings _jwtSettings;
@@ -57,10 +47,10 @@ namespace JWTCommonLibForDotNetCore.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, identity.Id.ToString()),
-                    //new Claim(ClaimTypes.Role, identity.Role),
+                    new Claim(ClaimTypes.NameIdentifier, identity.Id.ToString()),
+                    new Claim(ClaimTypes.Name, identity.Username),
                 }),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddSeconds(int.Parse(_jwtSettings.TokenExpiredTimeInSecounds)),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 

@@ -4,5 +4,7 @@ namespace JWTCommonLibForDotNetCore.Helpers
     {
         public string Secret { get; set; }
         public string RedisConnectionString { get; set; }
+        public string TokenExpiredTimeInSecounds { get; set; }
+        
     }
 }
