@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using JWTCommonLibForDotNetCore.Services;
 using JWTCommonLibForDotNetCore.Entities;
+using JWTCommonLibForDotNetCore.Controllers.DataMember;
 
 namespace JWTCommonLibForDotNetCore.Controllers
 {
@@ -18,14 +19,14 @@ namespace JWTCommonLibForDotNetCore.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]Identity identityParam)
+        public IActionResult Authenticate([FromBody]AuthenticateRequest identityParam)
         {
-            var identity = _identityService.Authenticate(identityParam.Username, identityParam.PasswordHash());
+            var identity = _identityService.Authenticate(identityParam.Username, identityParam.Password);
 
             if (identity == null)
                 return Unauthorized(new { message = "Username or password is incorrect" });
 
-            return Ok(identity);
+            return Ok(new AuthenticateResponse(identity));
         }
 
         [HttpPost("revoke")]
@@ -34,8 +35,8 @@ namespace JWTCommonLibForDotNetCore.Controllers
         {
             var accesToken = Request.Headers["Authorization"];
             _identityService.RevokeToken(accesToken);
-             return Ok();
+            return Ok();
         }
-      
+
     }
 }

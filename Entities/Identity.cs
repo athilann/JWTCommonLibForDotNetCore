@@ -4,9 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography;
 using System.Text;
+using JWTCommonLibForDotNetCore.Helpers.Hashers;
 
 namespace JWTCommonLibForDotNetCore.Entities
 {
+    [Table("Identities")]
     public class Identity
     {
         [Key]
@@ -15,35 +17,32 @@ namespace JWTCommonLibForDotNetCore.Entities
         [Required]
         public string Username { get; set; }
         [Required]
-        public string Password { get; set; }
-        public List<Role> Roles { get; set; }
+        public string Part1 { get; set; }
+        [Required]
+        public string Part2 { get; set; }
+        [Required]
+        public string Part3 { get; set; }
+        [Required]
+        public bool NeedsUpgrade { get; set; }
+        public List<IdentityRole> Roles { get; set; }
+
 
         [NotMapped]
         public virtual string Token { get; set; }
-
         public Identity()
         {
-            Roles = new List<Role>();
+            Roles = new List<IdentityRole>();
         }
 
-        public string PasswordHash()
+        internal bool CheckPassword(IPasswordHasher passwordHasher, string password)
         {
-            using (SHA1Managed sha1 = new SHA1Managed())
-            {
-                var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(Password));
-                var sb = new StringBuilder(hash.Length * 2);
-
-                foreach (byte b in hash)
-                {
-                    // can be "x2" if you want lowercase
-                    sb.Append(b.ToString("X2"));
-                }
-
-                return sb.ToString();
-            }
+            var check = passwordHasher.Check(new string[] { Part1, Part2, Part3 }, password);
+            NeedsUpgrade = check.NeedsUpgrade;
+            return check.Verified;
         }
     }
 
+    [Table("Roles")]
     public class Role
     {
 
@@ -53,6 +52,24 @@ namespace JWTCommonLibForDotNetCore.Entities
         [Required]
         public string Name { get; set; }
         [Required]
+        public List<IdentityRole> Identities { get; set; }
+
+        public Role()
+        {
+            Identities = new List<IdentityRole>();
+        }
+    }
+
+
+    public class IdentityRole
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
         public Guid IdentityId { get; set; }
+        public Identity Identity { get; set; }
+
+        public int RoleId { get; set; }
+        public Role Role { get; set; }
     }
 }

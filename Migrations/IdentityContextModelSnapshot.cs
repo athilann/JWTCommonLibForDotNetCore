@@ -24,7 +24,15 @@ namespace JWTCommonLibForDotNetCore.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Password")
+                    b.Property<bool>("NeedsUpgrade");
+
+                    b.Property<string>("Part1")
+                        .IsRequired();
+
+                    b.Property<string>("Part2")
+                        .IsRequired();
+
+                    b.Property<string>("Part3")
                         .IsRequired();
 
                     b.Property<string>("Username")
@@ -35,7 +43,7 @@ namespace JWTCommonLibForDotNetCore.Migrations
                     b.ToTable("Identities");
                 });
 
-            modelBuilder.Entity("JWTCommonLibForDotNetCore.Entities.Role", b =>
+            modelBuilder.Entity("JWTCommonLibForDotNetCore.Entities.IdentityRole", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -43,21 +51,41 @@ namespace JWTCommonLibForDotNetCore.Migrations
 
                     b.Property<Guid>("IdentityId");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
+                    b.Property<int>("RoleId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("IdentityId");
 
-                    b.ToTable("Role");
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("IdentityRole");
                 });
 
             modelBuilder.Entity("JWTCommonLibForDotNetCore.Entities.Role", b =>
                 {
-                    b.HasOne("JWTCommonLibForDotNetCore.Entities.Identity")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("JWTCommonLibForDotNetCore.Entities.IdentityRole", b =>
+                {
+                    b.HasOne("JWTCommonLibForDotNetCore.Entities.Identity", "Identity")
                         .WithMany("Roles")
                         .HasForeignKey("IdentityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("JWTCommonLibForDotNetCore.Entities.Role", "Role")
+                        .WithMany("Identities")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

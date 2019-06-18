@@ -15,6 +15,7 @@ using System.Diagnostics;
 using JWTCommonLibForDotNetCore.Database;
 using Microsoft.EntityFrameworkCore;
 using JWTCommonLibForDotNetCore.Entities;
+using JWTCommonLibForDotNetCore.Helpers.Hashers;
 
 namespace JWTCommonLibForDotNetCore
 {
@@ -24,12 +25,15 @@ namespace JWTCommonLibForDotNetCore
         public static void AddJwt(this IServiceCollection services, IConfiguration Configuration)
         {
             services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IDataRepository<Identity>, IdentityManager>();
             services.AddDbContext<IdentityContext>(opts => opts.UseSqlServer(Configuration["ConnectionString:IdentityDB"]));
             services.AddMvc().AddApplicationPart(Assembly.Load(new AssemblyName("JWTCommonLibForDotNetCore"))); ;
 
             var appSettingsSection = Configuration.GetSection("JWTSettings");
             services.Configure<JWTSettings>(appSettingsSection);
+
+            services.Configure<HashingOptions>(Configuration.GetSection("HashingOptions"));
 
             var appSettings = appSettingsSection.Get<JWTSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);

@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using JWTCommonLibForDotNetCore.Entities;
 using JWTCommonLibForDotNetCore.Helpers;
 using JWTCommonLibForDotNetCore.Database;
+using Microsoft.AspNetCore.Identity;
+using JWTCommonLibForDotNetCore.Helpers.Hashers;
 
 namespace JWTCommonLibForDotNetCore.Services
 {
@@ -22,23 +24,33 @@ namespace JWTCommonLibForDotNetCore.Services
     {
 
         private readonly IDataRepository<Identity> _dataRepository;
+        private readonly IPasswordHasher _passwordHasher;
         private readonly JWTSettings _jwtSettings;
 
-        public IdentityService(IOptions<JWTSettings> jwtSettings, IDataRepository<Identity> dataRepository)
+        public IdentityService(IOptions<JWTSettings> jwtSettings, IDataRepository<Identity> dataRepository, IPasswordHasher passwordHasher)
         {
             _jwtSettings = jwtSettings.Value;
             _dataRepository = dataRepository;
+            _passwordHasher = passwordHasher;
         }
 
         public Identity Authenticate(string username, string password)
         {
-            var identityData = _dataRepository.Get(x => x.Username == username && x.Password == password, x => new { x.Id, x.Username, x.Roles }).FirstOrDefault();
+            var identity = _dataRepository.Get(x => x.Username == username, x => new Identity
+            {
+                Id = x.Id,
+                Username = x.Username,
+                Part1 = x.Part1,
+                Part2 = x.Part2,
+                Part3 = x.Part3
+            }).FirstOrDefault();
 
             // return null if user not found
-            if (identityData == null)
-                return null;
+            if (identity == null) return null;
+            if (!identity.CheckPassword(_passwordHasher, password)) return null;
+            
+            identity = _dataRepository.Get(identity.Id);
 
-            var identity = new Identity() { Id = identityData.Id, Username = identityData.Username, Roles = identityData.Roles };
 
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -56,15 +68,12 @@ namespace JWTCommonLibForDotNetCore.Services
 
             foreach (var role in identity.Roles)
             {
-                tokenDescriptor.Subject.AddClaim(new Claim(ClaimTypes.Role, role.Name));
+                tokenDescriptor.Subject.AddClaim(new Claim(ClaimTypes.Role, role.Role.Name));
             }
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             identity.Token = tokenHandler.WriteToken(token);
-
-            // remove password before returning
-            //identity.Password = null;
 
             return identity;
         }
