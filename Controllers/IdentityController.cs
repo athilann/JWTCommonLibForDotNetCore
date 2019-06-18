@@ -20,7 +20,7 @@ namespace JWTCommonLibForDotNetCore.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]Identity identityParam)
         {
-            var identity = _identityService.Authenticate(identityParam.Username, identityParam.Password);
+            var identity = _identityService.Authenticate(identityParam.Username, identityParam.PasswordHash());
 
             if (identity == null)
                 return Unauthorized(new { message = "Username or password is incorrect" });

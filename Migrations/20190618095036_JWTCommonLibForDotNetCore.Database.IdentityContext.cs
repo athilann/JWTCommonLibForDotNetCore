@@ -13,9 +13,8 @@ namespace JWTCommonLibForDotNetCore.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Username = table.Column<string>(nullable: true),
-                    Password = table.Column<string>(nullable: true),
-                    Token = table.Column<string>(nullable: true)
+                    Username = table.Column<string>(nullable: false),
+                    Password = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,8 +27,8 @@ namespace JWTCommonLibForDotNetCore.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true),
-                    IdentityId = table.Column<Guid>(nullable: true)
+                    Name = table.Column<string>(nullable: false),
+                    IdentityId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -39,7 +38,7 @@ namespace JWTCommonLibForDotNetCore.Migrations
                         column: x => x.IdentityId,
                         principalTable: "Identities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

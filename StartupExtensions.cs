@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using JWTCommonLibForDotNetCore.Database;
 using Microsoft.EntityFrameworkCore;
+using JWTCommonLibForDotNetCore.Entities;
 
 namespace JWTCommonLibForDotNetCore
 {
@@ -23,6 +24,7 @@ namespace JWTCommonLibForDotNetCore
         public static void AddJwt(this IServiceCollection services, IConfiguration Configuration)
         {
             services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<IDataRepository<Identity>, IdentityManager>();
             services.AddDbContext<IdentityContext>(opts => opts.UseSqlServer(Configuration["ConnectionString:IdentityDB"]));
             services.AddMvc().AddApplicationPart(Assembly.Load(new AssemblyName("JWTCommonLibForDotNetCore"))); ;
 

@@ -31,20 +31,24 @@ namespace JWTCommonLibForDotNetCore.Services
             new Identity { Id = Guid.NewGuid(), Username = "test6", Password = "test" }
         };
 
+        private readonly IDataRepository<Identity> _dataRepository;
         private readonly JWTSettings _jwtSettings;
 
-        public IdentityService(IOptions<JWTSettings> jwtSettings)
+        public IdentityService(IOptions<JWTSettings> jwtSettings, IDataRepository<Identity> dataRepository)
         {
             _jwtSettings = jwtSettings.Value;
+            _dataRepository = dataRepository;
         }
 
         public Identity Authenticate(string username, string password)
         {
-            var identity = _identities.SingleOrDefault(x => x.Username == username && x.Password == password);
+            var identityData = _dataRepository.Get(x => x.Username == username && x.Password == password, x => new { x.Id, x.Username, x.Roles }).FirstOrDefault();
 
             // return null if user not found
-            if (identity == null)
+            if (identityData == null)
                 return null;
+
+            var identity = new Identity() { Id = identityData.Id, Username = identityData.Username, Roles = identityData.Roles };
 
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -70,7 +74,7 @@ namespace JWTCommonLibForDotNetCore.Services
             identity.Token = tokenHandler.WriteToken(token);
 
             // remove password before returning
-            identity.Password = null;
+            //identity.Password = null;
 
             return identity;
         }

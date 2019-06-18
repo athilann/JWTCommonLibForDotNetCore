@@ -10,6 +10,17 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20190617170242_JWTCommonLibForDotNetCore.Database.IdentityContext.cs" />
+    <Compile Remove="Migrations\20190617170242_JWTCommonLibForDotNetCore.Database.IdentityContext.Designer.cs" />
+    <Compile Remove="Migrations\20190618094105_JWTCommonLibForDotNetCore.Database.IdentityContext.cs" />
+    <Compile Remove="Migrations\20190618094105_JWTCommonLibForDotNetCore.Database.IdentityContext.Designer.cs" />
+    <Compile Remove="Migrations\20190618094358_JWTCommonLibForDotNetCore.Database.IdentityContext.cs" />
+    <Compile Remove="Migrations\20190618094358_JWTCommonLibForDotNetCore.Database.IdentityContext.Designer.cs" />
+    <Compile Remove="Migrations\20190618094935_JWTCommonLibForDotNetCore.Database.IdentityContext.cs" />
+    <Compile Remove="Migrations\20190618094935_JWTCommonLibForDotNetCore.Database.IdentityContext.Designer.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
